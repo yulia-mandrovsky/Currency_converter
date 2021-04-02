@@ -18,6 +18,8 @@ let selectTo = document.querySelector('.other-currencies-to');
 let selectedCurrency = selectFrom.selectedIndex;
 let currencyFromChoice = document.querySelector('.currency-choice-from');
 let currencyToChoice = document.querySelector('.currency-choice-to');
+const currentExchangeLeft = document.querySelector('.current-exchange-rate-left');
+const currentExchangeRight = document.querySelector('.current-exchange-rate-right');
 
 // ~~~~~~~~~~~~~~~~~~LEFT BLOCK!!!!!!!
 
@@ -34,6 +36,7 @@ currencyFromChoice.addEventListener('click', event => {
     letActiveClassForLeft();
     if (event.target.tagName.toLowerCase() === 'button') {
     currencyFrom = event.target.innerHTML;
+    getData();
     } else {
         return;
     }
@@ -43,6 +46,7 @@ currencyFromChoice.addEventListener('click', event => {
 selectFrom.addEventListener('change', event => {
     letActiveClassForLeft()
     currencyFrom = document.querySelector('.other-currencies-from').value;
+    getData();
     console.log(currencyFrom)
 })
 
@@ -65,6 +69,7 @@ currencyToChoice.addEventListener('click', event => {
     letActiveClassForRight();
     if (event.target.tagName.toLowerCase() === 'button') {
     currencyTo = event.target.innerHTML;
+    getData();
     } else {
         return;
     }
@@ -74,6 +79,7 @@ currencyToChoice.addEventListener('click', event => {
 selectTo.addEventListener('change', event => {
     letActiveClassForRight()
     currencyTo = document.querySelector('.other-currencies-to').value;
+    getData();
     console.log(currencyTo)
 })
 
@@ -87,8 +93,25 @@ document.querySelector('.middle-arrow').addEventListener('click', event => {
     console.log('оно почти работает... но не прааильно. Доработать)')
 })
 
+// ~~~~~~~~~~~~~~~~~~~FOR API!!!!!!
 
-`https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`
+
+const getData = async () => {
+      
+    const response = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`);
+    const data = await response.json();
+    const response2 = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyTo}&symbols=${currencyFrom}`);
+    const data2 = await response2.json();
+    console.log(data, data2)
+    currentExchangeLeft.innerHTML = `1 ${currencyFrom} = ${data.rates[currencyTo]} ${currencyTo}`;
+    currentExchangeRight.innerHTML = `1 ${currencyTo} = ${data2.rates[currencyFrom]} ${currencyFrom}`;
+    return data;
+  }
+  
+
+// `1 ${data.base} = ${data.rates.USD} ${data.rates.key}`
+
+// `https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`
 
 
 

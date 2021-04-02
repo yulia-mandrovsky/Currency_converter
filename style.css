@@ -186,7 +186,7 @@ input:focus {
     outline: none;
 }
 
-.current-exchange-rate {
+.for-course {
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
