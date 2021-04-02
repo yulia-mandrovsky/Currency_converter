@@ -46,6 +46,10 @@ body {
     color: #959BA4;
 }
 
+.active-item {
+    color: black;;
+}
+
 .login-button {
     width: 58px;
     height: 33px;
@@ -63,6 +67,8 @@ body {
     color: #000000;
     margin-top: 9px;
     margin-right: 100px;
+    padding-top: 0;
+    padding-bottom: 0;
     padding-left: auto;
     padding-right: auto;
 }
@@ -85,12 +91,21 @@ h1 {
     color: #000000;
 }
 
+.wrapper-for-blocks {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+    align-items: center;
+}
+
 h3 {
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
     line-height: 14px;
     color: #9F9F9F;
+    text-align: left;
 }
 
 .currency-choice {
@@ -101,7 +116,9 @@ h3 {
     border: 1px solid #E5E5E5;
     box-sizing: border-box;
     border-radius: 3px;
+    overflow: hidden;
 }
+
 
 .currency {
     width: 51px;
@@ -115,10 +132,36 @@ h3 {
     text-align: center;
     justify-content: center;
     color: #C6C6C6;
+    background-color: white;
     border-right: 1px solid #E5E5E5;
+    border: none;
 }
 
+button:focus {
+    outline: none;
+}
+
+select{
+    -moz-appearance: none;
+    border: none;
+    position: relative;
+    outline: none;
+    padding: 5px;
+    color: #C6C6C6;
+    font-size: 12px;
+    line-height: 14px;
+    }
+
+    .active {
+        color: white;
+        background-color: #833AE0;
+    }
+
 .for-input-block {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items:flex-start;
     width: 259px;
     height: 102px;
     border: 1px solid #E5E5E5;
@@ -137,4 +180,28 @@ h3 {
     line-height: 42px;
     color: #000000;
     border: none;
+}
+
+input:focus {
+    outline: none;
+}
+
+.current-exchange-rate {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: #C6C6C6;
+    display: block;
+    position: relative;
+    top: 10px;
+    left: 16px;
+}
+
+option {
+    box-decoration-break: none;
+}
+
+.middle-arrow {
+    margin-top: 85px;
 }
