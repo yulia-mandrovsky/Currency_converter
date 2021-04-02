@@ -13,13 +13,29 @@
 let currencyFrom = 'RUB';
 let currencyTo = 'USD';
 let amount = 1;
-let selectFrom = document.querySelector('.other-currencies-from');
-let selectTo = document.querySelector('.other-currencies-to');
-let selectedCurrency = selectFrom.selectedIndex;
-let currencyFromChoice = document.querySelector('.currency-choice-from');
-let currencyToChoice = document.querySelector('.currency-choice-to');
+let courseLeftToRight = 0;
+let courseRightToLeft = 0;
+const selectFrom = document.querySelector('.other-currencies-from');
+const selectTo = document.querySelector('.other-currencies-to');
+const selectedCurrency = selectFrom.selectedIndex;
+const currencyFromChoice = document.querySelector('.currency-choice-from');
+const currencyToChoice = document.querySelector('.currency-choice-to');
 const currentExchangeLeft = document.querySelector('.current-exchange-rate-left');
 const currentExchangeRight = document.querySelector('.current-exchange-rate-right');
+const inputLeft = document.querySelector('.for-input-left');
+const inputRight = document.querySelector('.for-input-right');
+
+// добавить замену класса при работе стрелки
+// добавить окно загрузки
+// сделать контроль ввода и отображения:
+//                   замена точки на запятую  
+//                   отображение 4 знаков после запятой toFixed(кол-во з) !!!
+//                   разбивка по три символа при отображении в инпутах toLocaleString() ?
+
+// При недоступности API или ошибках при выполнении запроса 
+// на него приложение не зависает и не перестает работать, 
+// а пользователю выводится сообщение о том, что что-то пошло не так.
+
 
 // ~~~~~~~~~~~~~~~~~~LEFT BLOCK!!!!!!!
 
@@ -37,6 +53,7 @@ currencyFromChoice.addEventListener('click', event => {
     if (event.target.tagName.toLowerCase() === 'button') {
     currencyFrom = event.target.innerHTML;
     getData();
+    
     } else {
         return;
     }
@@ -49,10 +66,6 @@ selectFrom.addEventListener('change', event => {
     getData();
     console.log(currencyFrom)
 })
-
-// ~~~~~~~~~~~~~~~~~~ FOR COURSE STRINGS!!!
-
-
 
 
 // ~~~~~~~~~~~~~~~~~~~RIGHT BLOCK!!!!!!!!
@@ -84,69 +97,111 @@ selectTo.addEventListener('change', event => {
 })
 
 
-// ~~~~~~~~~~~~~~~~~~~~MIDDLE ARROW!!!
+// ~~~~~~~~~~~~~~~~~~~~MIDDLE ARROW!!! добавить изменение класса
 document.querySelector('.middle-arrow').addEventListener('click', event => {
     let a = currencyFrom;
     let b = currencyTo;
     currencyFrom = b;
     currencyTo = a;
-    console.log('оно почти работает... но не прааильно. Доработать)')
+    let indexSelectLeft = selectFrom.selectedIndex;
+    let indexSelectRight = selectTo.selectedIndex;
+    selectFrom.getElementsByTagName('option')[indexSelectRight].selected = 'selected';
+    selectTo.getElementsByTagName('option')[indexSelectLeft].selected = 'selected';
+
+    document.querySelectorAll('.choice-left').forEach(el => 
+        el.classList.remove('active'))
+    document.querySelectorAll('.button-left').forEach(el => {
+        if (el.innerHTML === currencyFrom) {
+            console.log(`I'm in if......`)
+            el.classList.add('active');
+        } 
+    })
+   if (document.querySelectorAll('.left-block button.active').length === 0) {
+        selectFrom.classList.add('active');
+   }
+    document.querySelectorAll('.choice-right').forEach(el => {
+        el.classList.remove('active')
+    })
+    document.querySelectorAll('.button-right').forEach(el => {
+        if (el.innerHTML === currencyTo) {
+            console.log(`I'm in if......`)
+            el.classList.add('active');
+        } 
+    })
+   if (document.querySelectorAll('.right-block button.active').length === 0) {
+        selectTo.classList.add('active');
+   }
+    console.log('оно почти работает... ??? select only)')
+    getData();
 })
 
 // ~~~~~~~~~~~~~~~~~~~FOR API!!!!!!
 
-
 const getData = async () => {
-      
-    const response = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`);
-    const data = await response.json();
-    const response2 = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyTo}&symbols=${currencyFrom}`);
-    const data2 = await response2.json();
-    console.log(data, data2)
-    currentExchangeLeft.innerHTML = `1 ${currencyFrom} = ${data.rates[currencyTo]} ${currencyTo}`;
-    currentExchangeRight.innerHTML = `1 ${currencyTo} = ${data2.rates[currencyFrom]} ${currencyFrom}`;
-    return data;
-  }
+    if (currencyFrom === currencyTo) {
+        courseLeftToRight = 1;
+        courseRightToLeft = 1;
+        console.log(`I work without API...`)
+    } else {  
+        const response = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`);
+        const data = await response.json();
+        courseLeftToRight = data.rates[currencyTo];
+        console.log(courseLeftToRight);
+        const response2 = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyTo}&symbols=${currencyFrom}`);
+        const data2 = await response2.json();
+        courseRightToLeft = data2.rates[currencyFrom];
+        console.log(courseRightToLeft);
+        console.log(data, data2);
+        console.log(`I work with API...`)
+    }
+    currentExchangeLeft.innerHTML = `1 ${currencyFrom} = ${courseLeftToRight} ${currencyTo}`;
+    currentExchangeRight.innerHTML = `1 ${currencyTo} = ${courseRightToLeft} ${currencyFrom}`;
+    inputToCalcLeft();
+}
   
+// ~~~~~~~~~~~~~~~~~~~~INPUT!!!!
 
-// `1 ${data.base} = ${data.rates.USD} ${data.rates.key}`
+// ~~~~~~~~~~~~LEFT!!!
 
-// `https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`
+inputLeft.addEventListener('input', event => {
+    inputToCalcLeft()
+})
+
+function inputToCalcLeft() {
+    let stringValue = String(inputLeft.value);
+    console.log(stringValue, '1')
+    stringValue = stringValue.replace(',', '.')
+    console.log(stringValue)
+    amount = Number(stringValue);
+    console.log(amount, 'bu')
+    inputRight.value = (amount * courseLeftToRight).toFixed(4);
+}
+
+// ~~~~~~~~~~RIGHT!!!
+
+inputRight.addEventListener('input', event => {
+    inputToCalcRight()
+})
+
+function inputToCalcRight() {
+    // if замена точки на запятую
+    amount = inputRight.value;
+    inputLeft.value = (amount * courseRightToLeft).toFixed(4);
+}
+
+// ~~~~~~~~~~~~~~~~~Loader!!!
+
+window.onload = function() {
+
+    setTimeout(function() {
+
+        document.getElementById("loading-block").style.display = "none";
+
+    }, 500);
+}
+
+// ~~~~~~~~~~~~~~~~~~~DEFAULT!!!
+
+getData();
 
 
-
-
-
-// нужна функция которая будет менять значение currencyFrom и currencyTo
-// добавлять и убирать класс эктив
-
-// const getCurrencyCourse = async (currencyFrom, currencyTo) => {
-//     let rate = 0;
-//     if (currencyFrom === currencyTo) {
-//         return Promise.resolve('the same');
-//       }
-//       const response = fetch(`https://api.ratesapi.io/api/latest?base=${CurrencyFrom}&symbols=${CurrencyTo}`);
-//       const data = await response.json();
-//     console.log(data);
-//     }
-
-// GetCurrencyCourse(CurrencyFrom, CurrencyTo)
-
-// getRate(currencyFrom, currencyTo) {
-//     let rate = 0;
-//      if (currencyFrom === "USD" && currencyTo === "EUR") {
-//           rate = 0.93;
-//         return Promise.resolve(rate);
-//     } else if (currencyFrom === "EUR" && currencyTo === "USD") {
-//         rate = 1.08;
-//         return Promise.resolve(rate);
-//     } else if (currencyFrom === "EUR" && currencyTo === "EUR") {
-//         rate = 1;
-//         return Promise.resolve(rate);
-//     } else if (currencyFrom === "USD" && currencyTo === "USD") {
-//         rate = 1;
-//         return Promise.resolve(rate);
-//     } else {
-//         return Promise.reject('Не все переданные валюты поддерживаются');
-//     }
-// }

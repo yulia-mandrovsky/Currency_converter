@@ -27,10 +27,10 @@
         <div class="converter-block left-block">
             <h3>У меня есть</h3>
             <div class="currency-choice currency-choice-from">
-                <button class="currency active choice-left">RUB</button>
-                <button class="currency choice-left">USD</button>
-                <button class="currency choice-left">EUR</button>
-                <button class="currency choice-left">GBP</button>
+                <button class="currency active choice-left button-left">RUB</button>
+                <button class="currency choice-left button-left">USD</button>
+                <button class="currency choice-left button-left">EUR</button>
+                <button class="currency choice-left button-left">GBP</button>
                 <select name="other-currencies" class="other-currencies-from choice-left">
                     <option value="HKD">HKD</option>
                     <option value="IDR">IDR</option>
@@ -64,7 +64,7 @@
                 </select>
             </div>
             <div class="for-input-block left-block-for-input">
-                   <input class="for-input" type="number" value="1"> 
+                   <input class="for-input for-input-left" type="number" value="1"> 
                    <p class="for-course current-exchange-rate-left"></p>
             </div>
         </div>
@@ -77,10 +77,10 @@
         <div class="converter-block right-block">
             <h3>Хочу приобрести</h3>
             <div class="currency-choice currency-choice-to">
-                <button class="currency choice-right" value="RUB">RUB</button>
-                <button class="currency choice-right active" value="USD">USD</button>
-                <button class="currency choice-right" value="EUR">EUR</button>
-                <button class="currency choice-right" value="GBP">GBP</button>
+                <button class="currency choice-right button-right" value="RUB">RUB</button>
+                <button class="currency choice-right button-right active" value="USD">USD</button>
+                <button class="currency choice-right button-right" value="EUR">EUR</button>
+                <button class="currency choice-right button-right" value="GBP">GBP</button>
                 <select name="other-currencies" class="other-currencies other-currencies-to choice-right">
                     <option value="HKD">HKD</option>
                     <option value="IDR">IDR</option>
@@ -114,14 +114,17 @@
                 </select>
             </div>
             <div class="for-input-block right-block-for-input">
-                   <input class="for-input" type="number"> 
+                   <input class="for-input for-input-right" type="number"> 
                    <p class="for-course current-exchange-rate-right"></p>
             </div>
         </div>
     </div>
-     
-
     </main>
+    <div id="loading-block">
+        <div>
+            Loading
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
