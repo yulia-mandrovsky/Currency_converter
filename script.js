@@ -24,36 +24,23 @@ const currentExchangeLeft = document.querySelector('.current-exchange-rate-left'
 const currentExchangeRight = document.querySelector('.current-exchange-rate-right');
 const inputLeft = document.querySelector('.for-input-left');
 const inputRight = document.querySelector('.for-input-right');
-
-// добавить замену класса при работе стрелки
-// добавить окно загрузки
-// сделать контроль ввода и отображения:
-//                   замена точки на запятую  
-//                   отображение 4 знаков после запятой toFixed(кол-во з) !!!
-//                   разбивка по три символа при отображении в инпутах toLocaleString() ?
-
-// При недоступности API или ошибках при выполнении запроса 
-// на него приложение не зависает и не перестает работать, 
-// а пользователю выводится сообщение о том, что что-то пошло не так.
+const forError = document.querySelector('.for-error');
+let newPar = document.querySelector('.new-p');
+const loadingBlock = document.querySelector(".loading-block");
+let flagAPI = false;
+const regTest = /^[0-9]*[.,]?[0-9]+$/;
 
 
 // ~~~~~~~~~~~~~~~~~~LEFT BLOCK!!!!!!!
 
-
-function letActiveClassForLeft() {
-    currencyFromChoice.addEventListener('click', event => {
+currencyFromChoice.addEventListener('click', event => {
     document.querySelectorAll('.choice-left').forEach(el =>
         el.classList.remove('active'))
     event.target.classList.add('active')
-})
-}
-
-currencyFromChoice.addEventListener('click', event => {
-    letActiveClassForLeft();
     if (event.target.tagName.toLowerCase() === 'button') {
     currencyFrom = event.target.innerHTML;
     getData();
-    
+
     } else {
         return;
     }
@@ -61,25 +48,20 @@ currencyFromChoice.addEventListener('click', event => {
 })
 
 selectFrom.addEventListener('change', event => {
-    letActiveClassForLeft()
+    document.querySelectorAll('.choice-left').forEach(el =>
+        el.classList.remove('active'))
+    event.target.classList.add('active')
     currencyFrom = document.querySelector('.other-currencies-from').value;
     getData();
     console.log(currencyFrom)
 })
 
-
 // ~~~~~~~~~~~~~~~~~~~RIGHT BLOCK!!!!!!!!
 
-function letActiveClassForRight() {
-    currencyToChoice.addEventListener('click', event => {
+currencyToChoice.addEventListener('click', event => {
     document.querySelectorAll('.choice-right').forEach(el =>
         el.classList.remove('active'))
     event.target.classList.add('active')
-})
-}
-
-currencyToChoice.addEventListener('click', event => {
-    letActiveClassForRight();
     if (event.target.tagName.toLowerCase() === 'button') {
     currencyTo = event.target.innerHTML;
     getData();
@@ -90,12 +72,13 @@ currencyToChoice.addEventListener('click', event => {
 })
 
 selectTo.addEventListener('change', event => {
-    letActiveClassForRight()
+    document.querySelectorAll('.choice-right').forEach(el =>
+        el.classList.remove('active'))
+    event.target.classList.add('active')
     currencyTo = document.querySelector('.other-currencies-to').value;
     getData();
     console.log(currencyTo)
 })
-
 
 // ~~~~~~~~~~~~~~~~~~~~MIDDLE ARROW!!! добавить изменение класса
 document.querySelector('.middle-arrow').addEventListener('click', event => {
@@ -131,7 +114,6 @@ document.querySelector('.middle-arrow').addEventListener('click', event => {
    if (document.querySelectorAll('.right-block button.active').length === 0) {
         selectTo.classList.add('active');
    }
-    console.log('оно почти работает... ??? select only)')
     getData();
 })
 
@@ -142,7 +124,9 @@ const getData = async () => {
         courseLeftToRight = 1;
         courseRightToLeft = 1;
         console.log(`I work without API...`)
-    } else {  
+        newPar.innerHTML = ``; 
+    } else try {  
+        showLoading();
         const response = await fetch(`https://api.ratesapi.io/api/latest?base=${currencyFrom}&symbols=${currencyTo}`);
         const data = await response.json();
         courseLeftToRight = data.rates[currencyTo];
@@ -152,51 +136,59 @@ const getData = async () => {
         courseRightToLeft = data2.rates[currencyFrom];
         console.log(courseRightToLeft);
         console.log(data, data2);
-        console.log(`I work with API...`)
+        flagAPI = true;
+        console.log(`I work with API...`);
+        loadingBlock.style.display = 'none';
+        newPar.innerHTML = ``; 
+    } catch(error) {
+            newPar.innerHTML = `Что-то пошло не так...`; 
+        console.log('something went wrong...', error);
     }
     currentExchangeLeft.innerHTML = `1 ${currencyFrom} = ${courseLeftToRight} ${currencyTo}`;
     currentExchangeRight.innerHTML = `1 ${currencyTo} = ${courseRightToLeft} ${currencyFrom}`;
-    inputToCalcLeft();
+    inputToCalcLeft(inputLeft, inputRight, courseLeftToRight);
 }
-  
+
 // ~~~~~~~~~~~~~~~~~~~~INPUT!!!!
 
 // ~~~~~~~~~~~~LEFT!!!
 
 inputLeft.addEventListener('input', event => {
-    inputToCalcLeft()
+    inputToCalcLeft(event.target, inputRight, courseLeftToRight)
 })
 
-function inputToCalcLeft() {
-    let stringValue = String(inputLeft.value);
+function inputToCalcLeft(el, secEl, course) {
+    let stringValue = String(el.value);
     console.log(stringValue, '1')
-    stringValue = stringValue.replace(',', '.')
-    console.log(stringValue)
-    amount = Number(stringValue);
-    console.log(amount, 'bu')
-    inputRight.value = (amount * courseLeftToRight).toFixed(4);
+    stringValue = stringValue
+        .replace(/([^0-9.,])/g, '')
+        .replace(/,/g, '.');
+const pointIndex = stringValue.indexOf('.');
+if (pointIndex !== -1) {
+    const pointAndBefore = stringValue.substring(0, pointIndex + 1);
+    const afterPoint = stringValue.substring(pointIndex + 1);
+    stringValue = `${pointAndBefore}${afterPoint.replace(/\./g, '')}`;
 }
+    console.log(stringValue)
+    el.value = stringValue;
+    console.log(amount, 'bu')
+    secEl.value = (Number(stringValue) * course).toFixed(4);
+}
+
 
 // ~~~~~~~~~~RIGHT!!!
 
 inputRight.addEventListener('input', event => {
-    inputToCalcRight()
+    inputToCalcLeft(event.target, inputLeft, courseRightToLeft)
 })
-
-function inputToCalcRight() {
-    // if замена точки на запятую
-    amount = inputRight.value;
-    inputLeft.value = (amount * courseRightToLeft).toFixed(4);
-}
 
 // ~~~~~~~~~~~~~~~~~Loader!!!
 
-window.onload = function() {
-
+const showLoading = function() {
     setTimeout(function() {
-
-        document.getElementById("loading-block").style.display = "none";
-
+        if (!flagAPI) {
+        loadingBlock.style.display = "block";
+        }
     }, 500);
 }
 
