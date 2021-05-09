@@ -17,7 +17,6 @@ const forError = document.querySelector('.for-error');
 let newPar = document.querySelector('.new-p');
 const loadingBlock = document.querySelector(".loading-block");
 let flagAPI = false;
-const regTest = /^[0-9]*[.,]?[0-9]+$/;
 const choiceLeft = document.querySelectorAll('.choice-left');
 const choiceRight = document.querySelectorAll('.choice-right');
 
@@ -45,6 +44,10 @@ selectFrom.addEventListener('change', event => {
     getData();
 })
 
+inputLeft.addEventListener('input', event => {
+    inputToCalc(event.target, inputRight, courseLeftToRight)
+})
+
 // ~~~~~~~~~~~~~~~~~~~RIGHT BLOCK!!!!!!!!
 
 currencyToChoice.addEventListener('click', event => {
@@ -65,6 +68,10 @@ selectTo.addEventListener('change', event => {
     event.target.classList.add('active')
     currencyTo = document.querySelector('.other-currencies-to').value;
     getData();
+})
+
+inputRight.addEventListener('input', event => {
+    inputToCalc(event.target, inputLeft, courseRightToLeft)
 })
 
 // ~~~~~~~~~~~~~~~~~~~~MIDDLE ARROW!!! добавить изменение класса
@@ -133,12 +140,6 @@ const getData = async () => {
 
 // ~~~~~~~~~~~~~~~~~~~~INPUT!!!!
 
-// ~~~~~~~~~~~~LEFT!!!
-
-inputLeft.addEventListener('input', event => {
-    inputToCalc(event.target, inputRight, courseLeftToRight)
-})
-
 function inputToCalc(el, secEl, course) {
     let stringValue = String(el.value);
     stringValue = stringValue
@@ -153,13 +154,6 @@ if (pointIndex !== -1) {
     el.value = stringValue;
     secEl.value = (Number(stringValue) * course).toFixed(4);
 }
-
-
-// ~~~~~~~~~~RIGHT!!!
-
-inputRight.addEventListener('input', event => {
-    inputToCalc(event.target, inputLeft, courseRightToLeft)
-})
 
 // ~~~~~~~~~~~~~~~~~Loader!!!
 
